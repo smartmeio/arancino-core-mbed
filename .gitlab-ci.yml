@@ -78,7 +78,7 @@ package_release:
 
     variables:
       GIT_STRATEGY: clone
-      GIT_SUBMODULE_STRATEGY: recursive
+      GIT_SUBMODULE_STRATEGY: normal
 
     script:
         # create some variables into temp folder
