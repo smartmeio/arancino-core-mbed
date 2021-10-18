@@ -80,6 +80,25 @@ package_release:
       GIT_STRATEGY: clone
       GIT_SUBMODULE_STRATEGY: normal
 
+    before_script:
+        # Do some replacements in platform.txt file, which are required because IDE
+        # handles tool paths differently when package is installed in hardware folder
+        - >
+          cat $PWD/platform.txt |
+          sed 's/^runtime.tools.pqt-.*.path=.*//g' |
+          sed 's/^tools.uf2conv.cmd=.*//g' |
+          sed 's/^#tools.uf2conv.cmd=/tools.uf2conv.cmd=/g' |
+          sed 's/^tools.picoprobe.cmd=.*//g' |
+          sed 's/^#tools.picoprobe.cmd=/tools.picoprobe.cmd=/g' |
+          sed "s/version=.*/version=$ver/g" |
+          sed -E "s/name=([a-zA-Z0-9\ -]+).*/name=\1($ver)/g" > $PWD/platform.txt
+
+        # Put core version and short hash of git version into core_version.h
+        - echo "#define ARDUINO_RP2040_GIT_VER 0x`git rev-parse --short=8 HEAD 2>/dev/null`" > cores/rp2040/core_version.h
+        - echo "#define ARDUINO_RP2040_GIT_DESC `git describe --tags 2>/dev/null`" >> cores/rp2040/core_version.h
+        - echo "#define ARDUINO_RP2040_RELEASE_$CI_COMMIT_TAG" >> cores/rp2040/core_version.h
+        - echo "#define ARDUINO_RP2040_RELEASE $CI_COMMIT_TAG" >> cores/rp2040/core_version.h
+
     script:
         # create some variables into temp folder
         - PKG_NAME=$PLATFORM_NAME-$CI_COMMIT_TAG
@@ -89,7 +108,7 @@ package_release:
         - echo $PKG_NAME_PIO > tmp/pkg_name_pio.txt
         - echo $CI_COMMIT_TAG > tmp/target_path.txt
 
-        # - sed -i "s:\(ARANCINO_CORE_VERSION\) .*:\1 \"$CI_COMMIT_TAG\":" ./cores/nRF5/Arduino.h
+        - sed -i "s:\(ARANCINO_CORE_VERSION\) .*:\1 \"$CI_COMMIT_TAG\":" ./cores/rp2040/Arduino.h
         - sed -i "s:\(version\)=.*:\1=$CI_COMMIT_TAG:" ./platform.txt
         - jq --arg tag_ver ${CI_COMMIT_TAG} '.version = $tag_ver' package.json|sponge package.json
 
@@ -104,11 +123,17 @@ package_release:
 
         - cd ..
         # tar files and move temp folder back
-        - tar --exclude=tmp --exclude=.git* --exclude=*.DS_Store* -cvjf $PKG_NAME.tar.bz2 $CI_PROJECT_NAME
+        - >
+          tar --exclude=tmp --exclude=.git* --exclude=*.DS_Store* \
+            --exclude=ArduinoCore-API --exclude=package --exclude=doc \
+            --exclude=.travis.yml -cvjf $PKG_NAME.tar.bz2 $CI_PROJECT_NAME
 
         # pio packaging
         - cp -r $CI_PROJECT_NAME framework-arduino-rp2040-arancino
-        - tar --exclude=tmp --exclude=.git* --exclude=*.DS_Store* -cvjf $PKG_NAME_PIO.tar.bz2 framework-arduino-rp2040-arancino
+        - >
+          tar --exclude=tmp --exclude=.git* --exclude=*.DS_Store* \
+            --exclude=ArduinoCore-API --exclude=package --exclude=doc \
+            --exclude=.travis.yml -cvjf $PKG_NAME_PIO.tar.bz2 framework-arduino-rp2040-arancino
 
         # move tar into temp folder
         - cd $CI_PROJECT_NAME
