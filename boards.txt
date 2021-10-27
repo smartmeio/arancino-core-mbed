@@ -5,7 +5,116 @@ menu.dbgport=Debug Port
 menu.dbglvl=Debug Level
 menu.boot2=Boot Stage 2
 menu.usbstack=USB Stack
-
+# -----------------------------------
+# Arancino Pico
+# -----------------------------------
+arancinopico.name=Arancino Pico
+arancinopico.vid.0=0x2e8a
+arancinopico.pid.0=0x000a
+arancinopico.build.usbpid=-DSERIALUSB_PID=0x000a
+arancinopico.build.board=RASPBERRY_PI_PICO
+arancinopico.build.mcu=cortex-m0plus
+arancinopico.build.variant=arancinopico
+arancinopico.upload.tool=uf2conv
+arancinopico.upload.maximum_size=2097152
+arancinopico.upload.maximum_data_size=262144
+arancinopico.upload.wait_for_upload_port=true
+arancinopico.upload.erase_cmd=
+arancinopico.serial.disableDTR=false
+arancinopico.serial.disableRTS=false
+arancinopico.build.f_cpu=125000000
+arancinopico.build.led=
+arancinopico.build.core=rp2040
+arancinopico.build.mcu=rp2040
+arancinopico.build.ldscript=memmap_default.ld
+arancinopico.build.ram_length=256k
+arancinopico.build.boot2=boot2_w25q080_2_padded_checksum
+arancinopico.build.vid=0x2e8a
+arancinopico.build.pid=0x000a
+arancinopico.build.usb_manufacturer="Raspberry Pi"
+arancinopico.build.usb_product="Pico"
+arancinopico.menu.flash.2097152_0=2MB (no FS)
+arancinopico.menu.flash.2097152_0.upload.maximum_size=2093056
+arancinopico.menu.flash.2097152_0.build.flash_length=2093056
+arancinopico.menu.flash.2097152_0.build.eeprom_start=270528512
+arancinopico.menu.flash.2097152_0.build.fs_start=270528512
+arancinopico.menu.flash.2097152_0.build.fs_end=270528512
+arancinopico.menu.flash.2097152_65536=2MB (Sketch: 1984KB, FS: 64KB)
+arancinopico.menu.flash.2097152_65536.upload.maximum_size=2027520
+arancinopico.menu.flash.2097152_65536.build.flash_length=2027520
+arancinopico.menu.flash.2097152_65536.build.eeprom_start=270528512
+arancinopico.menu.flash.2097152_65536.build.fs_start=270462976
+arancinopico.menu.flash.2097152_65536.build.fs_end=270528512
+arancinopico.menu.flash.2097152_131072=2MB (Sketch: 1920KB, FS: 128KB)
+arancinopico.menu.flash.2097152_131072.upload.maximum_size=1961984
+arancinopico.menu.flash.2097152_131072.build.flash_length=1961984
+arancinopico.menu.flash.2097152_131072.build.eeprom_start=270528512
+arancinopico.menu.flash.2097152_131072.build.fs_start=270397440
+arancinopico.menu.flash.2097152_131072.build.fs_end=270528512
+arancinopico.menu.flash.2097152_262144=2MB (Sketch: 1792KB, FS: 256KB)
+arancinopico.menu.flash.2097152_262144.upload.maximum_size=1830912
+arancinopico.menu.flash.2097152_262144.build.flash_length=1830912
+arancinopico.menu.flash.2097152_262144.build.eeprom_start=270528512
+arancinopico.menu.flash.2097152_262144.build.fs_start=270266368
+arancinopico.menu.flash.2097152_262144.build.fs_end=270528512
+arancinopico.menu.flash.2097152_524288=2MB (Sketch: 1536KB, FS: 512KB)
+arancinopico.menu.flash.2097152_524288.upload.maximum_size=1568768
+arancinopico.menu.flash.2097152_524288.build.flash_length=1568768
+arancinopico.menu.flash.2097152_524288.build.eeprom_start=270528512
+arancinopico.menu.flash.2097152_524288.build.fs_start=270004224
+arancinopico.menu.flash.2097152_524288.build.fs_end=270528512
+arancinopico.menu.flash.2097152_1048576=2MB (Sketch: 1MB, FS: 1MB)
+arancinopico.menu.flash.2097152_1048576.upload.maximum_size=1044480
+arancinopico.menu.flash.2097152_1048576.build.flash_length=1044480
+arancinopico.menu.flash.2097152_1048576.build.eeprom_start=270528512
+arancinopico.menu.flash.2097152_1048576.build.fs_start=269479936
+arancinopico.menu.flash.2097152_1048576.build.fs_end=270528512
+arancinopico.menu.freq.125=125 MHz
+arancinopico.menu.freq.125.build.f_cpu=125000000L
+arancinopico.menu.freq.50=50 MHz
+arancinopico.menu.freq.50.build.f_cpu=50000000L
+arancinopico.menu.freq.100=100 MHz
+arancinopico.menu.freq.100.build.f_cpu=100000000L
+arancinopico.menu.freq.133=133 MHz
+arancinopico.menu.freq.133.build.f_cpu=133000000L
+arancinopico.menu.freq.150=150 MHz (Overclock)
+arancinopico.menu.freq.150.build.f_cpu=150000000L
+arancinopico.menu.freq.175=175 MHz (Overclock)
+arancinopico.menu.freq.175.build.f_cpu=175000000L
+arancinopico.menu.freq.200=200 MHz (Overclock)
+arancinopico.menu.freq.200.build.f_cpu=200000000L
+arancinopico.menu.freq.225=225 MHz (Overclock)
+arancinopico.menu.freq.225.build.f_cpu=225000000L
+arancinopico.menu.freq.250=250 MHz (Overclock)
+arancinopico.menu.freq.250.build.f_cpu=250000000L
+arancinopico.menu.freq.275=275 MHz (Overclock)
+arancinopico.menu.freq.275.build.f_cpu=275000000L
+arancinopico.menu.freq.300=300 MHz (Overclock)
+arancinopico.menu.freq.300.build.f_cpu=300000000L
+arancinopico.menu.dbgport.Disabled=Disabled
+arancinopico.menu.dbgport.Disabled.build.debug_port=
+arancinopico.menu.dbgport.Serial=Serial
+arancinopico.menu.dbgport.Serial.build.debug_port=-DDEBUG_RP2040_PORT=Serial
+arancinopico.menu.dbgport.Serial1=Serial1
+arancinopico.menu.dbgport.Serial1.build.debug_port=-DDEBUG_RP2040_PORT=Serial1
+arancinopico.menu.dbgport.Serial2=Serial2
+arancinopico.menu.dbgport.Serial2.build.debug_port=-DDEBUG_RP2040_PORT=Serial2
+arancinopico.menu.dbglvl.None=None
+arancinopico.menu.dbglvl.None.build.debug_level=
+arancinopico.menu.dbglvl.Core=Core
+arancinopico.menu.dbglvl.Core.build.debug_level=-DDEBUG_RP2040_CORE
+arancinopico.menu.dbglvl.SPI=SPI
+arancinopico.menu.dbglvl.SPI.build.debug_level=-DDEBUG_RP2040_SPI
+arancinopico.menu.dbglvl.Wire=Wire
+arancinopico.menu.dbglvl.Wire.build.debug_level=-DDEBUG_RP2040_WIRE
+arancinopico.menu.dbglvl.All=All
+arancinopico.menu.dbglvl.All.build.debug_level=-DDEBUG_RP2040_WIRE -DDEBUG_RP2040_SPI -DDEBUG_RP2040_CORE
+arancinopico.menu.dbglvl.NDEBUG=NDEBUG
+arancinopico.menu.dbglvl.NDEBUG.build.debug_level=-DNDEBUG
+arancinopico.menu.usbstack.picosdk=Pico SDK
+arancinopico.menu.usbstack.picosdk.build.usbstack_flags="-I{runtime.platform.path}/tools/libpico"
+arancinopico.menu.usbstack.tinyusb=Adafruit TinyUSB
+arancinopico.menu.usbstack.tinyusb.build.usbstack_flags=-DUSE_TINYUSB "-I{runtime.platform.path}/libraries/Adafruit_TinyUSB_Arduino/src/arduino"
 # -----------------------------------
 # Raspberry Pi Pico
 # -----------------------------------
