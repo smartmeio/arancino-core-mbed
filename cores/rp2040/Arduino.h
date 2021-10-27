@@ -112,4 +112,9 @@ constexpr uint32_t __bitset(const int (&a)[N], size_t i = 0U) {
 #define ARANCINO_CORE_VERSION "0.0.0"
 #endif
 
+#ifndef MCU_FAMILY
+#define MCU_FAMILY "RP20"
+#endif
+
+
 #endif // Arduino_h
