@@ -133,6 +133,7 @@ def MakeBoard(name, vendor_name, product_name, vid, pid, boarddefine, flashsizem
 
 
 BuildGlobalMenuList()
+MakeBoard("arancinopico", "SmartMe.io", "Arancino Pico", "0x2e8a", "0x000a", "ARANCINO_PICO", 2, "boot2_w25q080_2_padded_checksum")
 MakeBoard("rpipico", "Raspberry Pi", "Pico", "0x2e8a", "0x000a", "RASPBERRY_PI_PICO", 2, "boot2_w25q080_2_padded_checksum")
 MakeBoard("adafruit_feather", "Adafruit", "Feather RP2040", "0x239a", "0x80f1", "ADAFRUIT_FEATHER_RP2040", 8, "boot2_w25x10cl_4_padded_checksum")
 MakeBoard("adafruit_itsybitsy", "Adafruit", "ItsyBitsy RP2040", "0x239a", "0x80fd", "ADAFRUIT_ITSYBITSY_RP2040", 8, "boot2_w25q080_2_padded_checksum")
