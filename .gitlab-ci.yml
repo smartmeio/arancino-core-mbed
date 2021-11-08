@@ -81,6 +81,9 @@ package_release:
       GIT_SUBMODULE_STRATEGY: normal
 
     before_script:
+        # cloning additional submodules
+        - cd pico-sdk && git submodule update --init && cd ..
+        - cd pico-extras && git submodule update --init && cd ..
         # Do some replacements in platform.txt file, which are required because IDE
         # handles tool paths differently when package is installed in hardware folder
         - >
