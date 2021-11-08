@@ -81,9 +81,6 @@ package_release:
       GIT_SUBMODULE_STRATEGY: normal
 
     before_script:
-        # cloning additional submodules
-        - cd pico-sdk && git submodule update --init && cd ..
-        - cd pico-extras && git submodule update --init && cd ..
         # Do some replacements in platform.txt file, which are required because IDE
         # handles tool paths differently when package is installed in hardware folder
         - >
@@ -101,6 +98,10 @@ package_release:
         - echo "#define ARDUINO_RP2040_GIT_DESC `git describe --tags 2>/dev/null`" >> cores/rp2040/core_version.h
         - echo "#define ARDUINO_RP2040_RELEASE_$CI_COMMIT_TAG" >> cores/rp2040/core_version.h
         - echo "#define ARDUINO_RP2040_RELEASE $CI_COMMIT_TAG" >> cores/rp2040/core_version.h
+
+        # cloning additional submodules
+        - cd pico-sdk && git submodule update --init && cd ..
+        - cd pico-extras && git submodule update --init && cd ..
 
     script:
         # create some variables into temp folder
