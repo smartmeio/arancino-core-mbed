@@ -89,9 +89,7 @@ package_release:
           sed 's/^tools.uf2conv.cmd=.*//g' |
           sed 's/^#tools.uf2conv.cmd=/tools.uf2conv.cmd=/g' |
           sed 's/^tools.picoprobe.cmd=.*//g' |
-          sed 's/^#tools.picoprobe.cmd=/tools.picoprobe.cmd=/g' |
-          sed "s/version=.*/version=$ver/g" |
-          sed -E "s/name=([a-zA-Z0-9\ -]+).*/name=\1($ver)/g" | tee platform.txt
+          sed 's/^#tools.picoprobe.cmd=/tools.picoprobe.cmd=/g' | tee platform.txt
 
         # Put core version and short hash of git version into core_version.h
         - echo "#define ARDUINO_RP2040_GIT_VER 0x`git rev-parse --short=8 HEAD 2>/dev/null`" > cores/rp2040/core_version.h
