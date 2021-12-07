@@ -21,7 +21,7 @@ board = env.BoardConfig()
 upload_protocol = env.subst("$UPLOAD_PROTOCOL") or "picotool"
 ram_size = board.get("upload.maximum_ram_size")
 
-FRAMEWORK_DIR = platform.get_package_dir("framework-arduinopico")
+FRAMEWORK_DIR = platform.get_package_dir("framework-arduino-rp2040-arancino")
 assert os.path.isdir(FRAMEWORK_DIR)
 
 # update progsize expression to also check for bootloader.
