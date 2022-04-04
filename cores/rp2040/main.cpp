@@ -23,7 +23,7 @@
 #include <pico/stdlib.h>
 #include <pico/multicore.h>
 
-RP2040 rp2040;
+//RP2040 rp2040;
 
 volatile bool _MFIFO::_otherIdled = false;
 mutex_t _pioMutex;
@@ -39,6 +39,7 @@ void initVariant() { }
 
 
 // Optional 2nd core setup and loop
+/*
 extern void setup1() __attribute__((weak));
 extern void loop1() __attribute__((weak));
 static void main1() {
@@ -52,7 +53,7 @@ static void main1() {
         }
     }
 }
-
+*/
 extern "C" int main() {
 #if F_CPU != 125000000
     set_sys_clock_khz(F_CPU / 1000, true);
@@ -80,6 +81,7 @@ extern "C" int main() {
 #endif
 
 #ifndef NO_USB
+/*
     if (setup1 || loop1) {
         rp2040.fifo.begin(2);
         multicore_launch_core1(main1);
@@ -87,6 +89,7 @@ extern "C" int main() {
         rp2040.fifo.begin(1);
     }
     rp2040.fifo.registerCore();
+ */
 #endif
 
     setup();
