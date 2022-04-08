@@ -23,7 +23,7 @@
 #include <pico/stdlib.h>
 #include <pico/multicore.h>
 
-//RP2040 rp2040;
+RP2040 rp2040;
 
 volatile bool _MFIFO::_otherIdled = false;
 mutex_t _pioMutex;
