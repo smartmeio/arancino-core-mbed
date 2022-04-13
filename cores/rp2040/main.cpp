@@ -91,7 +91,7 @@ extern "C" int main() {
     rp2040.fifo.registerCore();
  */
 #endif
-
+    
     setup();
     while (true) {
         loop();
