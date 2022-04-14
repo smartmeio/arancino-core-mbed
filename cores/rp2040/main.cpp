@@ -93,6 +93,9 @@ extern "C" int main() {
 #endif
     
     setup();
+#ifdef USE_FREERTOS
+    initFreeRTOS(128, tskIDLE_PRIORITY); //128 = stack depth for loop, tskIDLE_PRIORITY = priority
+#else 
     while (true) {
         loop();
 
@@ -110,5 +113,6 @@ extern "C" int main() {
             arduino::serialEvent2Run();
         }
     }
+#endif
     return 0;
 }

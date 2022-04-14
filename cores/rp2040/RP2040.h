@@ -27,8 +27,6 @@
 #include <pico/util/queue.h>
 #include <CoreMutex.h>
 
-#define USE_FREERTOS
-
 #ifdef USE_FREERTOS
 #include "../../libraries/smp-freertos-pico/src/RP2040_FreeRTOS.h"
 #endif
@@ -129,13 +127,11 @@ public:
     RP2040() {
         _epoch = 0;
         // Enable SYSTICK exception
-        #ifdef INC_FREERTOS_H
-
-        #else
+#ifndef USE_FREERTOS
         exception_set_exclusive_handler(SYSTICK_EXCEPTION, _SystickHandler);
         systick_hw->csr = 0x7;
         systick_hw->rvr = 0x00FFFFFF;
-        #endif
+#endif
     }
 
     ~RP2040() { /* noop */ }
@@ -155,9 +151,9 @@ public:
     // Get CPU cycle count.  Needs to do magic to extens 24b HW to something longer
     volatile uint64_t _epoch = 0;
     inline uint32_t getCycleCount() {
-        #ifdef INC_FREERTOS_H
+#ifdef USE_FREERTOS
         return xTaskGetTickCount() / configTICK_RATE_HZ * configCPU_CLOCK_HZ ;
-        #else
+#else
         uint32_t epoch;
         uint32_t ctr;
         do {
@@ -165,14 +161,14 @@ public:
             ctr = systick_hw->cvr;
         } while (epoch != (uint32_t)_epoch);
         return epoch + (1 << 24) - ctr; /* CTR counts down from 1<<24-1 */
-        #endif
+#endif
     }
     
 
     inline uint64_t getCycleCount64() {
-        #ifdef INC_FREERTOS_H
+#ifdef USE_FREERTOS
         return (uint64_t)xTaskGetTickCount() / configTICK_RATE_HZ * (uint64_t)configCPU_CLOCK_HZ ;
-        #else
+#else
         uint64_t epoch;
         uint64_t ctr;
         do {
@@ -180,7 +176,7 @@ public:
             ctr = systick_hw->cvr;
         } while (epoch != _epoch);
         return epoch + (1LL << 24) - ctr;
-        #endif
+#endif
     }
 
     void idleOtherCore() {
@@ -195,9 +191,7 @@ public:
     _MFIFO fifo;
 
 private:
-    #ifdef INC_FREERTOS_H
-    //Systick handler set from FreeRTOS
-    #else
+    #ifndef USE_FREERTOS
     static void _SystickHandler() {
         rp2040._epoch += 1LL << 24;
     }

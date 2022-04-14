@@ -5,6 +5,8 @@ menu.dbgport=Debug Port
 menu.dbglvl=Debug Level
 menu.boot2=Boot Stage 2
 menu.usbstack=USB Stack
+menu.freertos=Use FreeRTOS
+
 # -----------------------------------
 # Arancino Pico
 # -----------------------------------
@@ -115,3 +117,7 @@ arancinopico.menu.usbstack.picosdk=Pico SDK
 arancinopico.menu.usbstack.picosdk.build.usbstack_flags="-I{runtime.platform.path}/tools/libpico"
 arancinopico.menu.usbstack.tinyusb=Adafruit TinyUSB
 arancinopico.menu.usbstack.tinyusb.build.usbstack_flags=-DUSE_TINYUSB "-I{runtime.platform.path}/libraries/Adafruit_TinyUSB_Arduino/src/arduino"
+arancinopico.menu.freertos.Disabled=Disabled
+arancinopico.menu.freertos.Disabled.build.flags.freertos=
+arancinopico.menu.freertos.Enabled=Enabled
+arancinopico.menu.freertos.Enabled.build.flags.freertos=-DUSE_FREERTOS
