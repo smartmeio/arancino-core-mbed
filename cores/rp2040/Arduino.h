@@ -118,7 +118,11 @@ constexpr uint32_t __bitset(const int (&a)[N], size_t i = 0U) {
 //Arancino library defines #23n7ujc
 #define BAUDRATE 256000
 #define TIMEOUT 10000
+#ifdef USE_TINYUSB
+#define SERIAL_PORT SerialTinyUSB
+#else
 #define SERIAL_PORT Serial
+#endif
 #define SERIAL_DEBUG Serial1
 
 
