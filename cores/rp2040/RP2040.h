@@ -100,6 +100,7 @@ public:
 
 private:
     static void __no_inline_not_in_flash_func(_irq)() {
+#ifndef USE_FREERTOS
         multicore_fifo_clear_irq();
         noInterrupts(); // We need total control, can't run anything
         while (multicore_fifo_rvalid()) {
@@ -109,6 +110,7 @@ private:
                 break;
             }
         }
+#endif
         interrupts();
     }
     bool _multicore = false;
