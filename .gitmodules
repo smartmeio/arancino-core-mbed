@@ -25,3 +25,6 @@
 [submodule "libraries/Adafruit_TinyUSB_Arduino"]
 	path = libraries/Adafruit_TinyUSB_Arduino
 	url = https://github.com/adafruit/Adafruit_TinyUSB_Arduino.git
+[submodule "libraries/smp-freertos-pico"]
+	path = libraries/smp-freertos-pico
+	url = ssh://git@git.smartme.io:20022/marco/smp-freertos-pico.git
