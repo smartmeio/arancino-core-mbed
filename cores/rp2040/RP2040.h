@@ -25,11 +25,11 @@
 #include <hardware/structs/systick.h>
 #include <pico/multicore.h>
 #include <pico/util/queue.h>
-#include <CoreMutex.h>
+#include "CoreMutex.h"
+#include "ccount.pio.h"
 
-#ifdef USE_FREERTOS
-#include "../../libraries/smp-freertos-pico/src/RP2040_FreeRTOS.h"
-#endif
+
+extern "C" volatile bool __otherCoreIdled;
 
 class _MFIFO {
 public:
@@ -49,9 +49,12 @@ public:
     }
 
     void registerCore() {
-        multicore_fifo_clear_irq();
-        irq_set_exclusive_handler(SIO_IRQ_PROC0 + get_core_num(), _irq);
-        irq_set_enabled(SIO_IRQ_PROC0 + get_core_num(), true);
+        if (!__isFreeRTOS) {
+            multicore_fifo_clear_irq();
+            irq_set_exclusive_handler(SIO_IRQ_PROC0 + get_core_num(), _irq);
+            irq_set_enabled(SIO_IRQ_PROC0 + get_core_num(), true);
+        }
+        // FreeRTOS port.c will handle the IRQ hooking
     }
 
     void push(uint32_t val) {
@@ -83,9 +86,9 @@ public:
             return;
         }
         mutex_enter_blocking(&_idleMutex);
-        _otherIdled = false;
+        __otherCoreIdled = false;
         multicore_fifo_push_blocking(_GOTOSLEEP);
-        while (!_otherIdled) { /* noop */ }
+        while (!__otherCoreIdled) { /* noop */ }
     }
 
     void resumeOtherCore() {
@@ -93,112 +96,50 @@ public:
             return;
         }
         mutex_exit(&_idleMutex);
-        _otherIdled = false;
+        __otherCoreIdled = false;
         // Other core will exit busy-loop and return to operation
-        // once otherIdled == false.
+        // once __otherCoreIdled == false.
+    }
+
+    void clear() {
+        uint32_t val;
+
+        while (queue_try_remove(&_queue[0], &val)) {
+            tight_loop_contents();
+        }
+
+        while (queue_try_remove(&_queue[1], &val)) {
+            tight_loop_contents();
+        }
     }
 
 private:
     static void __no_inline_not_in_flash_func(_irq)() {
-#ifndef USE_FREERTOS
-        multicore_fifo_clear_irq();
-        noInterrupts(); // We need total control, can't run anything
-        while (multicore_fifo_rvalid()) {
-            if (_GOTOSLEEP == multicore_fifo_pop_blocking()) {
-                _otherIdled = true;
-                while (_otherIdled) { /* noop */ }
-                break;
+        if (!__isFreeRTOS) {
+            multicore_fifo_clear_irq();
+            noInterrupts(); // We need total control, can't run anything
+            while (multicore_fifo_rvalid()) {
+                if (_GOTOSLEEP == multicore_fifo_pop_blocking()) {
+                    __otherCoreIdled = true;
+                    while (__otherCoreIdled) { /* noop */ }
+                    break;
+                }
             }
+            interrupts();
         }
-#endif
-        interrupts();
     }
+
     bool _multicore = false;
-
     mutex_t _idleMutex;
-    static volatile bool _otherIdled;
     queue_t _queue[2];
-
-    static constexpr int _GOTOSLEEP = 0x66666666;
+    static constexpr uint32_t _GOTOSLEEP = 0xC0DED02E;
 };
+
 
 class RP2040;
 extern RP2040 rp2040;
-class RP2040 {
-public:
-    RP2040() {
-        _epoch = 0;
-        // Enable SYSTICK exception
-#ifndef USE_FREERTOS
-        exception_set_exclusive_handler(SYSTICK_EXCEPTION, _SystickHandler);
-        systick_hw->csr = 0x7;
-        systick_hw->rvr = 0x00FFFFFF;
-#endif
-    }
-
-    ~RP2040() { /* noop */ }
-
-
-    // Convert from microseconds to PIO clock cycles
-    static int usToPIOCycles(int us) {
-        // Parenthesis needed to guarantee order of operations to avoid 32bit overflow
-        return (us * (clock_get_hz(clk_sys) / 1000000));
-    }
-
-    // Get current clock frequency
-    static int f_cpu() {
-        return clock_get_hz(clk_sys);
-    }
-
-    // Get CPU cycle count.  Needs to do magic to extens 24b HW to something longer
-    volatile uint64_t _epoch = 0;
-    inline uint32_t getCycleCount() {
-#ifdef USE_FREERTOS
-        return xTaskGetTickCount() / configTICK_RATE_HZ * configCPU_CLOCK_HZ ;
-#else
-        uint32_t epoch;
-        uint32_t ctr;
-        do {
-            epoch = (uint32_t)_epoch;
-            ctr = systick_hw->cvr;
-        } while (epoch != (uint32_t)_epoch);
-        return epoch + (1 << 24) - ctr; /* CTR counts down from 1<<24-1 */
-#endif
-    }
-    
-
-    inline uint64_t getCycleCount64() {
-#ifdef USE_FREERTOS
-        return (uint64_t)xTaskGetTickCount() / configTICK_RATE_HZ * (uint64_t)configCPU_CLOCK_HZ ;
-#else
-        uint64_t epoch;
-        uint64_t ctr;
-        do {
-            epoch = _epoch;
-            ctr = systick_hw->cvr;
-        } while (epoch != _epoch);
-        return epoch + (1LL << 24) - ctr;
-#endif
-    }
-
-    void idleOtherCore() {
-        fifo.idleOtherCore();
-    }
-
-    void resumeOtherCore() {
-        fifo.resumeOtherCore();
-    }
-
-    // Multicore comms FIFO
-    _MFIFO fifo;
-
-private:
-    #ifndef USE_FREERTOS
-    static void _SystickHandler() {
-        rp2040._epoch += 1LL << 24;
-    }
-    #endif
-};
+extern "C" void main1();
+class PIOProgram;
 
 // Wrapper class for PIO programs, abstracting common operations out
 // TODO - Add unload/destructor
@@ -254,3 +195,90 @@ private:
     const pio_program_t *_pgm;
 };
 
+class RP2040 {
+public:
+    RP2040()  { /* noop */ }
+    ~RP2040() { /* noop */ }
+
+    void begin() {
+        _epoch = 0;
+        if (!__isFreeRTOS) {
+            // Enable SYSTICK exception
+            exception_set_exclusive_handler(SYSTICK_EXCEPTION, _SystickHandler);
+            systick_hw->csr = 0x7;
+            systick_hw->rvr = 0x00FFFFFF;
+        } else {
+            int off = 0;
+            _ccountPgm = new PIOProgram(&ccount_program);
+            _ccountPgm->prepare(&_pio, &_sm, &off);
+            ccount_program_init(_pio, _sm, off);
+            pio_sm_set_enabled(_pio, _sm, true);
+        }
+    }
+
+    // Convert from microseconds to PIO clock cycles
+    static int usToPIOCycles(int us) {
+        // Parenthesis needed to guarantee order of operations to avoid 32bit overflow
+        return (us * (clock_get_hz(clk_sys) / 1000000));
+    }
+
+    // Get current clock frequency
+    static int f_cpu() {
+        return clock_get_hz(clk_sys);
+    }
+
+    // Get CPU cycle count.  Needs to do magic to extens 24b HW to something longer
+    volatile uint64_t _epoch = 0;
+    inline uint32_t getCycleCount() {
+        if (!__isFreeRTOS) {
+            uint32_t epoch;
+            uint32_t ctr;
+            do {
+                epoch = (uint32_t)_epoch;
+                ctr = systick_hw->cvr;
+            } while (epoch != (uint32_t)_epoch);
+            return epoch + (1 << 24) - ctr; /* CTR counts down from 1<<24-1 */
+        } else {
+            return ccount_read(_pio, _sm);
+        }
+    }
+
+    inline uint64_t getCycleCount64() {
+        if (!__isFreeRTOS) {
+            uint64_t epoch;
+            uint64_t ctr;
+            do {
+                epoch = _epoch;
+                ctr = systick_hw->cvr;
+            } while (epoch != _epoch);
+            return epoch + (1LL << 24) - ctr;
+        } else {
+            return ccount_read(_pio, _sm);
+        }
+    }
+
+    void idleOtherCore() {
+        fifo.idleOtherCore();
+    }
+
+    void resumeOtherCore() {
+        fifo.resumeOtherCore();
+    }
+
+    void restartCore1() {
+        multicore_reset_core1();
+        fifo.clear();
+        multicore_launch_core1(main1);
+    }
+
+    // Multicore comms FIFO
+    _MFIFO fifo;
+
+private:
+    static void _SystickHandler() {
+        rp2040._epoch += 1LL << 24;
+    }
+    PIO _pio;
+    int _sm;
+    PIOProgram *_ccountPgm;
+};
