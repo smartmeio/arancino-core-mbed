@@ -28,3 +28,6 @@
 [submodule "libraries/smp-freertos-pico"]
 	path = libraries/smp-freertos-pico
 	url = ssh://git@git.smartme.io:20022/marco/smp-freertos-pico.git
+[submodule "libraries/FreeRTOS"]
+	path = libraries/FreeRTOS
+	url = ssh://git@git.smartme.io:20022/godario/freertos-rp2040.git
