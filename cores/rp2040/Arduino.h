@@ -25,13 +25,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include "stdlib_noniso.h" // Wacky deprecated AVR compatibility functions
-//#include "RP2040Version.h"
+#include "RP2040Version.h"
 #include "api/ArduinoAPI.h"
 #include "api/itoa.h" // ARM toolchain doesn't provide itoa etc, provide them
 #include <pins_arduino.h>
 #include "hardware/gpio.h" // Required for the port*Register macros
 #include "debug_internal.h"
-//#include "RP2040.h" // CMSIS
+//#include <RP2040.h> // CMSIS
 
 // Try and make the best of the old Arduino abs() macro.  When in C++, use
 // the sane std::abs() call, but for C code use their macro since stdlib abs()
@@ -101,7 +101,7 @@ extern bool __isFreeRTOS;
 #endif
 
 #include "SerialUART.h"
-#include "RP2040.h"
+#include "RP2040Support.h"
 #include "SerialPIO.h"
 #include "Bootsel.h"
 
