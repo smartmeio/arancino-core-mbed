@@ -123,7 +123,7 @@ size_t SerialUSB::write(const uint8_t *buf, size_t length) {
     }
 
     static uint64_t last_avail_time;
-    int i = 0;
+    int written = 0;
     if (tud_cdc_connected()) {
         for (size_t i = 0; i < length;) {
             int n = length - i;
@@ -136,6 +136,7 @@ size_t SerialUSB::write(const uint8_t *buf, size_t length) {
                 tud_task();
                 tud_cdc_write_flush();
                 i += n2;
+                written += n2;
                 last_avail_time = time_us_64();
             } else {
                 tud_task();
@@ -150,7 +151,7 @@ size_t SerialUSB::write(const uint8_t *buf, size_t length) {
         // reset our timeout
         last_avail_time = 0;
     }
-    return i;
+    return written;
 }
 
 SerialUSB::operator bool() {
@@ -172,13 +173,10 @@ static void CheckSerialReset() {
         reset_usb_boot(0, 0);
         while (1); // WDT will fire here
     }
-    if ((_bps == 300) && (!_dtr)) {
+        if ((_bps == 300) && (!_dtr)) {
         //reset the MCU with 300 bps
         watchdog_reboot(0,0,0);
     }
-
-
-
 }
 
 extern "C" void tud_cdc_line_state_cb(uint8_t itf, bool dtr, bool rts) {
