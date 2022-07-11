@@ -28,6 +28,7 @@ extern "C" void pinMode(pin_size_t ulPin, PinMode ulMode) {
     case INPUT:
         gpio_init(ulPin);
         gpio_set_dir(ulPin, false);
+        gpio_disable_pulls(ulPin);
         break;
     case INPUT_PULLUP:
         gpio_init(ulPin);
@@ -42,7 +43,24 @@ extern "C" void pinMode(pin_size_t ulPin, PinMode ulMode) {
         gpio_put(ulPin, 1);
         break;
     case OUTPUT:
+    case OUTPUT_4MA:
         gpio_init(ulPin);
+        gpio_set_drive_strength(ulPin, GPIO_DRIVE_STRENGTH_4MA);
+        gpio_set_dir(ulPin, true);
+        break;
+    case OUTPUT_2MA:
+        gpio_init(ulPin);
+        gpio_set_drive_strength(ulPin, GPIO_DRIVE_STRENGTH_2MA);
+        gpio_set_dir(ulPin, true);
+        break;
+    case OUTPUT_8MA:
+        gpio_init(ulPin);
+        gpio_set_drive_strength(ulPin, GPIO_DRIVE_STRENGTH_8MA);
+        gpio_set_dir(ulPin, true);
+        break;
+    case OUTPUT_12MA:
+        gpio_init(ulPin);
+        gpio_set_drive_strength(ulPin, GPIO_DRIVE_STRENGTH_12MA);
         gpio_set_dir(ulPin, true);
         break;
     default:

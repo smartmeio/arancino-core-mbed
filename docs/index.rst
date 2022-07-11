@@ -29,12 +29,15 @@ For the latest version, always check https://github.com/earlephilhower/arduino-p
    EEPROM <eeprom>
    I2S Audio <i2s>
    Serial USB and UARTs <serial>
+   "Software Serial" PIO UART <piouart>
    Servo <servo>
    SPI <spi>
    Wire(I2C) <wire>
    File Systems (SD, SDFS, LittleFS) <fs>
    USB (Arduino and Adafruit_TinyUSB) <usb>
    Multicore Processing <multicore>
+
+   FreeRTOS SMP (multicore) <freertos>
 
    Ported/Optimized Libraries <libraries>
    Using Pico-SDK <sdk>
