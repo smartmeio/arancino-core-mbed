@@ -104,6 +104,7 @@ package_release:
         # cloning additional submodules
         - cd pico-sdk && git submodule update --init && cd ..
         - cd pico-extras && git submodule update --init && cd ..
+        - cd libraries/FreeRTOS && git submodule update --init && cd ..
 
     script:
         # create some variables into temp folder
