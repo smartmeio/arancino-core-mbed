@@ -27,7 +27,7 @@
 	url = https://github.com/adafruit/Adafruit_TinyUSB_Arduino.git
 [submodule "libraries/FreeRTOS/lib/FreeRTOS-Kernel"]
 	path = libraries/FreeRTOS/lib/FreeRTOS-Kernel
-	url = https://git.smartme.io/godario/FreeRTOS-Kernel.git
+	url = https://github.com/smartmeio/FreeRTOS-Kernel.git
 [submodule "libraries/FreeRTOS"]
 	path = libraries/FreeRTOS
 	url = https://github.com/smartmeio/FreeRTOS-RP2040.git
