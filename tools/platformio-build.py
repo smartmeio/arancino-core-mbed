@@ -24,7 +24,7 @@ upload_protocol = env.subst("$UPLOAD_PROTOCOL") or "picotool"
 # override to correct 256K for RAM section in linkerscript
 ram_size = 256 * 1024 # not the 264K, which is 256K SRAM + 2*4K SCRATCH(X/Y). 
 
-FRAMEWORK_DIR = platform.get_package_dir("framework-arduinopico")
+FRAMEWORK_DIR = platform.get_package_dir("framework-arduino-rp2040-arancino")
 assert os.path.isdir(FRAMEWORK_DIR)
 
 # read includes from this file to add them into CPPPATH later for good IDE intellisense
