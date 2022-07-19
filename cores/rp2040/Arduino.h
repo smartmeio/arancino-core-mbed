@@ -119,4 +119,11 @@ template <size_t N>
 constexpr uint32_t __bitset(const int (&a)[N], size_t i = 0U) {
     return i < N ? (1L << a[i]) | __bitset(a, i + 1) : 0;
 }
+
+// Allows Arancino Lib to read this value and pass it to Arancino Module
+// This value is modified in a CI/CD environment when a new tag is created
+#ifndef ARANCINO_CORE_VERSION
+#define ARANCINO_CORE_VERSION "0.0.0"
+#endif
+
 #endif
