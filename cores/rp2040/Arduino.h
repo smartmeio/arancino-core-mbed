@@ -130,4 +130,10 @@ constexpr uint32_t __bitset(const int (&a)[N], size_t i = 0U) {
 #define MCU_FAMILY "RP20"
 #endif
 
+//Arancino library defines #23n7ujc
+#define BAUDRATE 256000
+#define TIMEOUT 10000
+#define SERIAL_PORT Serial
+#define SERIAL_DEBUG Serial1
+
 #endif
