@@ -101,10 +101,8 @@ package_release:
         - echo "#define ARDUINO_RP2040_RELEASE_$CI_COMMIT_TAG" >> cores/rp2040/core_version.h
         - echo "#define ARDUINO_RP2040_RELEASE $CI_COMMIT_TAG" >> cores/rp2040/core_version.h
 
-        # cloning additional submodules
+        # cloning additional submodules for pico-sdk
         - cd pico-sdk && git submodule update --init && cd ..
-        - cd pico-extras && git submodule update --init && cd ..
-        - cd libraries/FreeRTOS && git submodule update --init && cd .. && cd ..
 
     script:
         # create some variables into temp folder
