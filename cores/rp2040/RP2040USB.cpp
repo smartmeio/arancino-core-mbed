@@ -52,7 +52,6 @@ mutex_t __usb_mutex;
 #endif
 
 #define USBD_DESC_LEN (TUD_CONFIG_DESC_LEN + TUD_CDC_DESC_LEN)
-#define USBD_MAX_POWER_MA (250)
 
 #define USBD_ITF_CDC (0) // needs 2 interfaces
 #define USBD_ITF_MAX (2)
@@ -121,49 +120,49 @@ int __USBGetMouseReportID() {
     return __USBInstallKeyboard ? 2 : 1;
 }
 
+static int      __hid_report_len = 0;
+static uint8_t *__hid_report     = nullptr;
+
 static uint8_t *GetDescHIDReport(int *len) {
-    static uint8_t *report = nullptr;
-    int report_len = 0;
-
-    if (report) {
-        free(report);
-        report = nullptr;
+    if (len) {
+        *len = __hid_report_len;
     }
+    return __hid_report;
+}
 
+void __SetupDescHIDReport() {
     if (__USBInstallKeyboard && __USBInstallMouse) {
         uint8_t desc_hid_report[] = {
             TUD_HID_REPORT_DESC_KEYBOARD(HID_REPORT_ID(1)),
             TUD_HID_REPORT_DESC_MOUSE(HID_REPORT_ID(2))
         };
-        report_len = sizeof(desc_hid_report);
-        report = (uint8_t *)malloc(report_len);
-        if (report) {
-            memcpy(report, desc_hid_report, report_len);
+        __hid_report = (uint8_t *)malloc(sizeof(desc_hid_report));
+        if (__hid_report) {
+            __hid_report_len = sizeof(desc_hid_report);
+            memcpy(__hid_report, desc_hid_report, __hid_report_len);
         }
     } else if (__USBInstallKeyboard && ! __USBInstallMouse) {
         uint8_t desc_hid_report[] = {
             TUD_HID_REPORT_DESC_KEYBOARD(HID_REPORT_ID(1))
         };
-        report_len = sizeof(desc_hid_report);
-        report = (uint8_t *)malloc(report_len);
-        if (report) {
-            memcpy(report, desc_hid_report, report_len);
+        __hid_report = (uint8_t *)malloc(sizeof(desc_hid_report));
+        if (__hid_report) {
+            __hid_report_len = sizeof(desc_hid_report);
+            memcpy(__hid_report, desc_hid_report, __hid_report_len);
         }
-    } else { // if (!__USBInstallKeyboard && __USBInstallMouse) {
+    } else if (! __USBInstallKeyboard &&  __USBInstallMouse) {
         uint8_t desc_hid_report[] = {
             TUD_HID_REPORT_DESC_MOUSE(HID_REPORT_ID(1))
         };
-        report_len = sizeof(desc_hid_report);
-        report = (uint8_t *)malloc(report_len);
-        if (report) {
-            memcpy(report, desc_hid_report, report_len);
+        __hid_report = (uint8_t *)malloc(sizeof(desc_hid_report));
+        if (__hid_report) {
+            __hid_report_len = sizeof(desc_hid_report);
+            memcpy(__hid_report, desc_hid_report, __hid_report_len);
         }
+    } else {
+        __hid_report = nullptr;
+        __hid_report_len = 0;
     }
-
-    if (len) {
-        *len = report_len;
-    }
-    return report;
 }
 
 // Invoked when received GET HID REPORT DESCRIPTOR
@@ -174,11 +173,13 @@ uint8_t const * tud_hid_descriptor_report_cb(uint8_t instance) {
     return GetDescHIDReport(nullptr);
 }
 
-
+static uint8_t *usbd_desc_cfg = nullptr;
 const uint8_t *tud_descriptor_configuration_cb(uint8_t index) {
     (void)index;
-    static uint8_t *usbd_desc_cfg = nullptr;
+    return usbd_desc_cfg;
+}
 
+void __SetupUSBDescriptor() {
     if (!usbd_desc_cfg) {
         bool hasHID = __USBInstallKeyboard || __USBInstallMouse;
 
@@ -230,7 +231,6 @@ const uint8_t *tud_descriptor_configuration_cb(uint8_t index) {
             }
         }
     }
-    return usbd_desc_cfg;
 }
 
 const uint16_t *tud_descriptor_string_cb(uint8_t index, uint16_t langid) {
@@ -288,11 +288,16 @@ static int64_t timer_task(__unused alarm_id_t id, __unused void *user_data) {
     return USB_TASK_INTERVAL;
 }
 
+void __USBStart() __attribute__((weak));
+
 void __USBStart() {
     if (tusb_inited()) {
         // Already called
         return;
     }
+
+    __SetupDescHIDReport();
+    __SetupUSBDescriptor();
 
     mutex_init(&__usb_mutex);
 

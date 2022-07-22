@@ -25,11 +25,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include "stdlib_noniso.h" // Wacky deprecated AVR compatibility functions
+#include "RP2040Version.h"
 #include "api/ArduinoAPI.h"
 #include "api/itoa.h" // ARM toolchain doesn't provide itoa etc, provide them
 #include <pins_arduino.h>
 #include "hardware/gpio.h" // Required for the port*Register macros
 #include "debug_internal.h"
+#include <RP2040.h> // CMSIS
 
 // Try and make the best of the old Arduino abs() macro.  When in C++, use
 // the sane std::abs() call, but for C code use their macro since stdlib abs()
@@ -69,12 +71,16 @@ void noInterrupts();
 #define portModeRegister(port)      ((volatile uint32_t*) sio_hw->gpio_oe)
 
 // ADC RP2040-specific calls
+void analogReadResolution(int bits);
 float analogReadTemp();  // Returns core temp in Centigrade
 
 // PWM RP2040-specific calls
 void analogWriteFreq(uint32_t freq);
 void analogWriteRange(uint32_t range);
 void analogWriteResolution(int res);
+
+// FreeRTOS potential calls
+extern bool __isFreeRTOS;
 
 #ifdef __cplusplus
 } // extern "C"
@@ -95,7 +101,8 @@ void analogWriteResolution(int res);
 #endif
 
 #include "SerialUART.h"
-#include "RP2040.h"
+#include "RP2040Support.h"
+#include "SerialPIO.h"
 #include "Bootsel.h"
 
 // Template which will evaluate at *compile time* to a single 32b number
@@ -115,6 +122,15 @@ constexpr uint32_t __bitset(const int (&a)[N], size_t i = 0U) {
 #ifndef MCU_FAMILY
 #define MCU_FAMILY "RP20"
 #endif
+//Arancino library defines #23n7ujc
+#define BAUDRATE 256000
+#define TIMEOUT 10000
+#ifdef USE_TINYUSB
+#define SERIAL_PORT SerialTinyUSB
+#else
+#define SERIAL_PORT Serial
+#endif
+#define SERIAL_DEBUG Serial1
 
 
 #endif // Arduino_h
