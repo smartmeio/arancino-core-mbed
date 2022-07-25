@@ -24,6 +24,9 @@
                      "name": "Raspberry Pi Pico W"
                   },
                   {
+                     "name": "SmartMe.io Arancino Pico"
+                  },
+                  {
                      "name": "Adafruit Feather RP2040"
                   },
                   {
