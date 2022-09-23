@@ -28,3 +28,6 @@
 [submodule "libraries/FreeRTOS"]
 	path = libraries/FreeRTOS
 	url = https://github.com/smartmeio/FreeRTOS-RP2040.git
+[submodule "libraries/ESP8266SdFat"]
+	path = libraries/ESP8266SdFat
+	url = https://github.com/earlephilhower/ESP8266SdFat.git
