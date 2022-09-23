@@ -18,8 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef Arduino_h
-#define Arduino_h
+#pragma once
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -91,6 +90,15 @@ extern bool __isFreeRTOS;
 #define HAVE_HWSERIAL1
 #define HAVE_HWSERIAL2
 
+// PSTR/etc.
+#ifndef FPSTR
+#define FPSTR (const char *)
+#endif
+
+#ifndef PGM_VOID_P
+#define PGM_VOID_P void *
+#endif
+
 #ifdef __cplusplus
 
 #ifdef USE_TINYUSB
@@ -111,7 +119,6 @@ template <size_t N>
 constexpr uint32_t __bitset(const int (&a)[N], size_t i = 0U) {
     return i < N ? (1L << a[i]) | __bitset(a, i + 1) : 0;
 }
-#endif
 
 // Allows Arancino Lib to read this value and pass it to Arancino Module
 // This value is modified in a CI/CD environment when a new tag is created
@@ -122,6 +129,7 @@ constexpr uint32_t __bitset(const int (&a)[N], size_t i = 0U) {
 #ifndef MCU_FAMILY
 #define MCU_FAMILY "RP20"
 #endif
+
 //Arancino library defines #23n7ujc
 #define BAUDRATE 256000
 #define TIMEOUT 10000
@@ -132,5 +140,4 @@ constexpr uint32_t __bitset(const int (&a)[N], size_t i = 0U) {
 #endif
 #define SERIAL_DEBUG Serial1
 
-
-#endif // Arduino_h
+#endif

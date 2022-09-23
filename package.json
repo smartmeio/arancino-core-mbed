@@ -1,6 +1,6 @@
 {
   "name": "framework-arduino-rp2040-arancino",
-  "version": "1.20202.0",
+  "version": "1.20504.0",
   "description": "Arduino Wiring-based Framework (RPi Pico RP2040) for Arancino boards",
   "keywords": [
     "framework",
