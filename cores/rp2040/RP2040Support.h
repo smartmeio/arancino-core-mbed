@@ -21,13 +21,18 @@
 #include <hardware/clocks.h>
 #include <hardware/irq.h>
 #include <hardware/pio.h>
+#include <pico/unique_id.h>
 #include <hardware/exception.h>
+#include <hardware/watchdog.h>
+#include <hardware/structs/rosc.h>
 #include <hardware/structs/systick.h>
 #include <pico/multicore.h>
 #include <pico/util/queue.h>
 #include "CoreMutex.h"
 #include "ccount.pio.h"
+#include <malloc.h>
 
+#include "_freertos.h"
 
 extern "C" volatile bool __otherCoreIdled;
 
@@ -85,6 +90,11 @@ public:
         if (!_multicore) {
             return;
         }
+        __holdUpPendSV = 1;
+        if (__isFreeRTOS) {
+            vTaskPreemptionDisable(nullptr);
+            vTaskSuspendAll();
+        }
         mutex_enter_blocking(&_idleMutex);
         __otherCoreIdled = false;
         multicore_fifo_push_blocking(_GOTOSLEEP);
@@ -97,6 +107,12 @@ public:
         }
         mutex_exit(&_idleMutex);
         __otherCoreIdled = false;
+        if (__isFreeRTOS) {
+            xTaskResumeAll();
+            vTaskPreemptionEnable(nullptr);
+        }
+        __holdUpPendSV = 0;
+
         // Other core will exit busy-loop and return to operation
         // once __otherCoreIdled == false.
     }
@@ -140,6 +156,9 @@ class RP2040;
 extern RP2040 rp2040;
 extern "C" void main1();
 class PIOProgram;
+
+extern "C" char __StackLimit;
+extern "C" char __bss_end__;
 
 // Wrapper class for PIO programs, abstracting common operations out
 // TODO - Add unload/destructor
@@ -219,7 +238,7 @@ public:
     // Convert from microseconds to PIO clock cycles
     static int usToPIOCycles(int us) {
         // Parenthesis needed to guarantee order of operations to avoid 32bit overflow
-        return (us * (clock_get_hz(clk_sys) / 1000000));
+        return (us * (clock_get_hz(clk_sys) / 1'000'000));
     }
 
     // Get current clock frequency
@@ -257,6 +276,19 @@ public:
         }
     }
 
+    inline int getFreeHeap() {
+        return getTotalHeap() - getUsedHeap();
+    }
+
+    inline int getUsedHeap() {
+        struct mallinfo m = mallinfo();
+        return m.uordblks;
+    }
+
+    inline int getTotalHeap() {
+        return &__StackLimit  - &__bss_end__;
+    }
+
     void idleOtherCore() {
         fifo.idleOtherCore();
     }
@@ -271,8 +303,58 @@ public:
         multicore_launch_core1(main1);
     }
 
+    void reboot() {
+        watchdog_reboot(0, 0, 10);
+        while (1) {
+            continue;
+        }
+    }
+
+    inline void restart() {
+        reboot();
+    }
+
+    void wdt_begin(uint32_t delay_ms) {
+        watchdog_enable(delay_ms, 1);
+    }
+
+    void wdt_reset() {
+        watchdog_update();
+    }
+
+    const char *getChipID() {
+        static char id[PICO_UNIQUE_BOARD_ID_SIZE_BYTES + 1] = { 0 };
+        if (!id[0]) {
+            pico_get_unique_board_id_string(id, sizeof(id));
+        }
+        return id;
+    }
+
     // Multicore comms FIFO
     _MFIFO fifo;
+
+
+    // TODO - Not so great HW random generator.  32-bits wide.  Cryptographers somewhere are crying
+    uint32_t hwrand32() {
+        // Try and whiten the HW ROSC bit
+        uint32_t r = 0;
+        for (int k = 0; k < 32; k++) {
+            unsigned long int b;
+            do {
+                b = rosc_hw->randombit & 1;
+                if (b != (rosc_hw->randombit & 1)) {
+                    break;
+                }
+            } while (true);
+            r <<= 1;
+            r |= b;
+        }
+        // Stir using the cycle count LSBs.  In any WiFi use case this will be a random # since the connection time is not cycle-accurate
+        uint64_t rr = (((uint64_t)~r) << 32LL) | r;
+        rr >>= rp2040.getCycleCount() & 32LL;
+
+        return (uint32_t)rr;
+    }
 
 private:
     static void _SystickHandler() {

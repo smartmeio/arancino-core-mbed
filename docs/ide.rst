@@ -38,7 +38,7 @@ for normal operations.
 Generic RP2040 Support
 ----------------------
 If your RP2040 board isn't in the menus you can still use it with the
-IDE bu using the `Board->Generic RP2040` menu option.  You will need to
+IDE by using the `Board->Generic RP2040` menu option.  You will need to
 then set the flash size (see above) and tell the IDE how to communicate
 with the flash chip using the `Tools->Boot Stage 2` menu.
 
@@ -70,4 +70,4 @@ is preferred as it is faster, but some boards do require `/4` on the
 custom chip interfaces.
 
 When in doubt, `Generic SPI /4` should work with any flash chip but is
-slow.  
+slow.

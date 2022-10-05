@@ -101,10 +101,8 @@ package_release:
         - echo "#define ARDUINO_RP2040_RELEASE_$CI_COMMIT_TAG" >> cores/rp2040/core_version.h
         - echo "#define ARDUINO_RP2040_RELEASE $CI_COMMIT_TAG" >> cores/rp2040/core_version.h
 
-        # cloning additional submodules
+        # cloning additional submodules for pico-sdk
         - cd pico-sdk && git submodule update --init && cd ..
-        - cd pico-extras && git submodule update --init && cd ..
-        - cd libraries/FreeRTOS && git submodule update --init && cd .. && cd ..
 
     script:
         # create some variables into temp folder
@@ -138,14 +136,14 @@ package_release:
         # tar files and move temp folder back
         - >
           tar --exclude=tmp --exclude=.git* --exclude=*.DS_Store* \
-            --exclude=ArduinoCore-API --exclude=package --exclude=doc \
+            --exclude=package --exclude=doc \
             --exclude=.travis.yml -cvjf $PKG_NAME.tar.bz2 $CI_PROJECT_NAME
 
         # pio packaging
         - cp -r $CI_PROJECT_NAME framework-arduino-rp2040-arancino
         - >
           tar --exclude=tmp --exclude=.git* --exclude=*.DS_Store* \
-            --exclude=ArduinoCore-API --exclude=package --exclude=doc \
+            --exclude=package --exclude=doc \
             --exclude=.travis.yml -cvjf $PKG_NAME_PIO.tar.bz2 framework-arduino-rp2040-arancino
 
         # move tar into temp folder
