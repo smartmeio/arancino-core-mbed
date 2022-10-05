@@ -136,14 +136,14 @@ package_release:
         # tar files and move temp folder back
         - >
           tar --exclude=tmp --exclude=.git* --exclude=*.DS_Store* \
-            --exclude=ArduinoCore-API --exclude=package --exclude=doc \
+            --exclude=package --exclude=doc \
             --exclude=.travis.yml -cvjf $PKG_NAME.tar.bz2 $CI_PROJECT_NAME
 
         # pio packaging
         - cp -r $CI_PROJECT_NAME framework-arduino-rp2040-arancino
         - >
           tar --exclude=tmp --exclude=.git* --exclude=*.DS_Store* \
-            --exclude=ArduinoCore-API --exclude=package --exclude=doc \
+            --exclude=package --exclude=doc \
             --exclude=.travis.yml -cvjf $PKG_NAME_PIO.tar.bz2 framework-arduino-rp2040-arancino
 
         # move tar into temp folder
