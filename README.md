@@ -1,5 +1,5 @@
 # Arancino Pico core
-[![Release](https://img.shields.io/github/v/release/smartmeio/arancino-core-rp2040?style=plastic)](https://github.com/earlephilhower/arduino-pico/releases)
+![Release](https://img.shields.io/github/v/release/smartmeio/arancino-core-rp2040?style=plastic)
 
 This core is a fork of the [earlephilhower Arduino-Pico](https://github.com/earlephilhower/arduino-pico) core modified to support the functionality of the Arancino architecture.
 It uses the bare Raspberry Pi Pico SDK and a custom GCC 10.3/Newlib 4.0 toolchain.
@@ -15,7 +15,7 @@ This core is available as a package in the Arduino IDE cores manager. If you wan
   2. Add this URL `https://raw.githubusercontent.com/smartmeio/arancino-boards/master/package_smartmeio_index.json` in the **Additional Boards Manager URLs** field, and click OK.
   3. Open the **Boards Manager** (menu `Tools` -> `Board` -> `Board Manager...`)
   4. Install **Arancino RP2040 Boards**
-  5. Select one of the boards under **Arancino Boards** in `Tools` -> `Board` menu
+  5. Select one of the boards under **Arancino RP2040 Boards** in `Tools` -> `Board` menu
 
 ## Installation on PlatformIO and Visual Studio Code
 To create a project with Visual Studio Code and PlatformIO it is necessary to initially create a project for Raspberry Pico and then modify the `platformio.ini` file in order to point to the Arancino packages. The `platformio.ini` file must be modififed in order to contains this configuration:
