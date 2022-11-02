@@ -28,9 +28,10 @@ framework = arduino
 platform_packages =
     smartmeio/framework-arduino-rp2040-arancino@https://github.com/smartmeio/arancino-core-rp2040.git
     toolchain-pico@https://github.com/earlephilhower/pico-quick-toolchain/releases/download/1.4.0-c/x86_64-linux-gnu.arm-none-eabi-0196c06.220714.tar.gz
+lib_deps = https://github.com/smartmeio/arancino-library
 upload_port = ...
 ```
-Any used library (e.g. Arancino library) must be included under the `lib` folder, so the project structure should look like:
+Any other used library must be included as dependency through `lib_deps` (as for the Arancino library) or saved under the `lib` folder; in the latter case the project structure should look like:
 ```
 include
 lib
