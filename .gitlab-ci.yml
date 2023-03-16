@@ -20,6 +20,7 @@ start:
         GIT_STRATEGY: none
 
     script:
+        - rm -rf tmp/
         - mkdir -p tmp
         - echo `date +%Y-%m-%d` > tmp/date.txt
         - echo `date +%H-%M-%S` > tmp/time.txt
@@ -38,36 +39,36 @@ start:
         - branches
 
 ######## PUSH
-#push:
-#  stage: start
-#  when: manual
-#  only: ['tags']
-#  except: ['master', 'branches']
+push:
+  stage: start
+  when: manual
+  only: ['tags']
+  except: ['master', 'branches']
 
-#  allow_failure: true
+  allow_failure: true
 
-#  variables:
-#    GIT_STRATEGY: clone
+  variables:
+    GIT_STRATEGY: clone
 
-#  before_script:
-#    - eval `python3 check-version-tag.py ${CI_COMMIT_TAG}`
+  before_script:
+    - eval `python3 check-version-tag.py ${CI_COMMIT_TAG}`
 
-#  script:
-#    #- apk add git
-#    - git remote add github https://$GITHUB_BOT_USERNAME:$GITHUB_ACCESS_TOKEN@github.com/$GITHUB_DEST_REPO
-#    #- git remote show github
-#    #- git remote show origin
-#    #- git branch -a
-#    - git checkout $CI_COMMIT_TAG
-#    - git fetch github
-#    #- git push github $CI_COMMIT_REF_NAME --force
-#    - >
-#      if [[ ${PRE_RELEASE} == "test"  ]]; then
-#        echo "not performing TAG push";
-#      else
-#        git push github ${CI_COMMIT_TAG}
-#      fi
-#    - git push github --all --force
+  script:
+    #- apk add git
+    - git remote add github https://$GITHUB_BOT_USERNAME:$GITHUB_ACCESS_TOKEN@github.com/$GITHUB_DEST_REPO
+    #- git remote show github
+    #- git remote show origin
+    #- git branch -a
+    - git checkout $CI_COMMIT_TAG
+    - git fetch github
+    #- git push github $CI_COMMIT_REF_NAME --force
+    - >
+      if [[ ${PRE_RELEASE} == "test"  ]]; then
+        echo "not performing TAG push";
+      else
+        git push github ${CI_COMMIT_TAG}
+      fi
+    - git push github --all --force
 
 #################################
 #######      PACKAGE      #######
@@ -132,6 +133,9 @@ package_release:
 
         # adding MQTT PubSubClient into core
         - git clone $REPO_LIB_PUBSUBCLIENT_URL -b v2.8 libraries/PubSubClient
+
+        # adding ArduinoSreamUtils into core
+        - git clone $REPO_LIB_STREAMUTILS_URL -b v1.7.3 libraries/StreamUtils
 
         - cd ..
         # tar files and move temp folder back
@@ -244,7 +248,7 @@ index:
         #git clone della repo dell'index ()
         - git config user.name devops
         - git config user.email devops@smartme.io
-        - git clone https://$REPO_USR:$REPO_PWD@git.smartme.io/sergio/smartmeio-package-index.git tmp/index
+        - git clone https://$REPO_USR:$REPO_PWD@git.smartme.io/smartme.io/arancino/ide/smartmeio-package-index.git tmp/index
         - cd tmp/index
         - git checkout dev
         - package_template=`cat template_platform_smartmeio_$CORE_NAME.json`
