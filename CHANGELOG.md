@@ -1,5 +1,8 @@
 # Changelog
 
+#### v 1.2.1 - 2023.03.DD
+* Add StreamUtils Library [#XXXXXX](https://app.clickup.com/t/XXXXXXX)
+
 #### v 1.2.0 - 2022.09.27
 * Alignment with upstream version [2.5.4](https://github.com/earlephilhower/arduino-pico/releases/tag/2.5.4)
 
