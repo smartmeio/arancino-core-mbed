@@ -1,6 +1,6 @@
 # Changelog
 
-#### v 1.2.1 - 2023.03.DD
+#### v 1.2.1 - 2023.04.06
 * Add StreamUtils Library [#863gbdk9u](https://app.clickup.com/t/863gbdk9u)
 * Fixed WString inclusion [#863gbdkn5](https://app.clickup.com/t/863gbdkn5)
 
